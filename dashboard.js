@@ -2,34 +2,21 @@ import { firebaseConfig } from './config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // تابع برای نمایش پیام‌های موقت (Toast)
-    // به بیرون منتقل شد تا در همه جا قابل دسترس باشد
     function showToast(message) {
         let toast = document.getElementById('toast-notification');
         if (!toast) {
             toast = document.createElement('div');
             toast.id = 'toast-notification';
-            // استایل‌های لازم را به توست اضافه می‌کنیم تا همیشه کار کند
-            toast.style.position = 'fixed';
-            toast.style.left = '50%';
-            toast.style.transform = 'translateX(-50%)';
-            toast.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-            toast.style.color = 'white';
-            toast.style.padding = '10px 20px';
-            toast.style.borderRadius = '20px';
-            toast.style.zIndex = '2000';
-            toast.style.transition = 'bottom 0.5s ease';
-            toast.style.bottom = '-100px'; // موقعیت اولیه
-            toast.style.fontSize = '0.875rem';
             document.body.appendChild(toast);
         }
         toast.textContent = message;
-        toast.style.bottom = '8rem'; // نمایش
+        toast.classList.add('show');
         setTimeout(() => {
-            toast.style.bottom = '-100px'; // پنهان کردن
+            toast.classList.remove('show');
         }, 3000);
     }
 
-    // اعمال تم اولیه قبل از هر کاری برای جلوگیری از پرش صفحه
+    // اعمال تم اولیه
     const themeToggleBtn = document.getElementById('theme-toggle');
     const updateThemeIcons = () => {
         const isDark = document.documentElement.classList.contains('dark');
@@ -47,22 +34,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     updateThemeIcons();
 
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const auth = firebase.auth();
-
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            initializeAppLogic(user); 
-        } else {
-            window.location.href = 'index.html';
-        }
-    });
-
     // ========================================================================
     // Passkey/WebAuthn Logic
     // ========================================================================
-    const { startRegistration, startAuthentication } = SimpleWebAuthnBrowser;
+    // *** FIX: Access the library from the global `window` object to prevent reference errors ***
+    const { startRegistration, startAuthentication } = window.SimpleWebAuthnBrowser;
     
     const functionsBaseUrl = '/api';
 
@@ -132,8 +108,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         return response.json();
     }
-
+    
     // ========================================================================
+
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            initializeAppLogic(user); 
+        } else {
+            window.location.href = 'index.html';
+        }
+    });
 
     async function initializeAppLogic(user) {
         const mobileWrapper = document.getElementById('mobile-wrapper');
@@ -146,25 +134,27 @@ document.addEventListener('DOMContentLoaded', () => {
         const isAppLockEnabled = localStorage.getItem(`appLockEnabled_${user.uid}`) === 'true';
         if (isAppLockEnabled) {
             appLockOverlay.classList.add('visible');
-            unlockBtn.onclick = async () => {
-                try {
-                    const options = await getAuthenticationOptions(user);
-                    if (!options) return;
+            if (unlockBtn) {
+                unlockBtn.onclick = async () => {
+                    try {
+                        const options = await getAuthenticationOptions(user);
+                        if (!options) return;
 
-                    const authResult = await startAuthentication(options);
-                    const verification = await verifyAuthentication(authResult);
+                        const authResult = await startAuthentication(options);
+                        const verification = await verifyAuthentication(authResult);
 
-                    if (verification && verification.verified) {
-                        appLockOverlay.classList.remove('visible');
-                    } else {
-                        showToast('احراز هویت با Face ID ناموفق بود.');
+                        if (verification && verification.verified) {
+                            appLockOverlay.classList.remove('visible');
+                        } else {
+                            showToast('احراز هویت با Face ID ناموفق بود.');
+                        }
+                    } catch (error) {
+                        console.error('Authentication error:', error);
+                        const errorMessage = error.name === 'NotAllowedError' ? 'درخواست توسط شما لغو شد.' : 'خطا در فرآیند احراز هویت.';
+                        showToast(errorMessage);
                     }
-                } catch (error) {
-                    console.error('Authentication error:', error);
-                    const errorMessage = error.name === 'NotAllowedError' ? 'درخواست توسط شما لغو شد.' : 'خطا در فرآیند احراز هویت.';
-                    showToast(errorMessage);
-                }
-            };
+                };
+            }
         }
 
         const hideSplash = () => {
@@ -487,7 +477,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         
                         const regResult = await startRegistration(options);
                         
-                        // *** DEBUGGING: Log the object being sent to the server ***
                         console.log("Data being sent to verify-registration:", JSON.stringify(regResult, null, 2));
 
                         const verification = await verifyRegistration(regResult);
@@ -628,8 +617,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const closeEditAccountBtn = document.getElementById('close-edit-account-btn');
             const deleteAccountBtn = document.getElementById('delete-account-btn');
             
-            closeAddAccountBtn.addEventListener('click', () => mobileWrapper.classList.remove('view-add-account'));
-            closeEditAccountBtn.addEventListener('click', () => mobileWrapper.classList.remove('view-edit-account'));
+            if(closeAddAccountBtn) closeAddAccountBtn.addEventListener('click', () => mobileWrapper.classList.remove('view-add-account'));
+            if(closeEditAccountBtn) closeEditAccountBtn.addEventListener('click', () => mobileWrapper.classList.remove('view-edit-account'));
 
             const populateBankSelect = (selectElement) => {
                 if (!selectElement) return;
@@ -1011,4 +1000,3 @@ document.addEventListener('DOMContentLoaded', () => {
         performInitialLoad();
         initializeSubPageScripts();
     }
-});
