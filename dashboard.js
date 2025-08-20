@@ -1,6 +1,34 @@
 import { firebaseConfig } from './config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+    // تابع برای نمایش پیام‌های موقت (Toast)
+    // به بیرون منتقل شد تا در همه جا قابل دسترس باشد
+    function showToast(message) {
+        let toast = document.getElementById('toast-notification');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'toast-notification';
+            // استایل‌های لازم را به توست اضافه می‌کنیم تا همیشه کار کند
+            toast.style.position = 'fixed';
+            toast.style.left = '50%';
+            toast.style.transform = 'translateX(-50%)';
+            toast.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+            toast.style.color = 'white';
+            toast.style.padding = '10px 20px';
+            toast.style.borderRadius = '20px';
+            toast.style.zIndex = '2000';
+            toast.style.transition = 'bottom 0.5s ease';
+            toast.style.bottom = '-100px'; // موقعیت اولیه
+            toast.style.fontSize = '0.875rem';
+            document.body.appendChild(toast);
+        }
+        toast.textContent = message;
+        toast.style.bottom = '8rem'; // نمایش
+        setTimeout(() => {
+            toast.style.bottom = '-100px'; // پنهان کردن
+        }, 3000);
+    }
+
     // اعمال تم اولیه قبل از هر کاری برای جلوگیری از پرش صفحه
     const themeToggleBtn = document.getElementById('theme-toggle');
     const updateThemeIcons = () => {
@@ -36,33 +64,35 @@ document.addEventListener('DOMContentLoaded', () => {
     // ========================================================================
     const { startRegistration, startAuthentication } = SimpleWebAuthnBrowser;
     
-    // *** CHANGE HERE: Using the new /api/ proxy path ***
-    // آدرس پایه توابع که از طریق پراکسی نتلیفای قابل دسترسی است
     const functionsBaseUrl = '/api';
 
-    // تابع برای دریافت گزینه‌های ثبت‌نام از سرور
     async function getRegistrationOptions(user) {
         console.log('Requesting registration options from server for user:', user.uid);
-        const response = await fetch(`${functionsBaseUrl}/generate-registration-options`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                userID: user.uid,
-                username: user.email,
-            }),
-        });
-        
-        const responseBody = await response.json();
-        if (!response.ok) {
-            console.error('Server returned an error for registration options:', responseBody);
-            showToast(`خطای سرور: ${responseBody.error || 'نا مشخص'}`);
+        try {
+            const response = await fetch(`${functionsBaseUrl}/generate-registration-options`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userID: user.uid,
+                    username: user.email,
+                }),
+            });
+            
+            const responseBody = await response.json();
+            if (!response.ok) {
+                console.error('Server returned an error for registration options:', responseBody);
+                showToast(`خطای سرور: ${responseBody.error || 'نا مشخص'}`);
+                return null;
+            }
+            console.log('Received registration options:', responseBody);
+            return responseBody;
+        } catch (error) {
+            console.error('Fetch error during getRegistrationOptions:', error);
+            showToast('خطا در ارتباط با سرور.');
             return null;
         }
-        console.log('Received registration options:', responseBody);
-        return responseBody;
     }
 
-    // تابع برای ارسال نتیجه ثبت‌نام به سرور جهت تایید
     async function verifyRegistration(verificationData) {
         console.log('Sending registration verification to server:', verificationData);
         const response = await fetch(`${functionsBaseUrl}/verify-registration`, {
@@ -80,7 +110,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return responseBody;
     }
     
-    // تابع برای دریافت گزینه‌های احراز هویت از سرور
     async function getAuthenticationOptions(user) {
          const response = await fetch(`${functionsBaseUrl}/generate-authentication-options`, {
             method: 'POST',
@@ -95,7 +124,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return response.json();
     }
 
-    // تابع برای ارسال نتیجه احراز هویت به سرور جهت تایید
     async function verifyAuthentication(verificationData) {
         const response = await fetch(`${functionsBaseUrl}/verify-authentication`, {
             method: 'POST',
@@ -459,6 +487,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         
                         const regResult = await startRegistration(options);
                         
+                        // *** DEBUGGING: Log the object being sent to the server ***
+                        console.log("Data being sent to verify-registration:", JSON.stringify(regResult, null, 2));
+
                         const verification = await verifyRegistration(regResult);
 
                         if (verification && verification.verified) {
