@@ -607,9 +607,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
             
-            document.getElementById('add-account-btn').addEventListener('click', () => {
-                mobileWrapper.classList.add('view-add-account');
-            });
+            const addAccountBtn = document.getElementById('add-account-btn');
+            if(addAccountBtn) {
+                addAccountBtn.addEventListener('click', () => {
+                    mobileWrapper.classList.add('view-add-account');
+                });
+            }
 
             const addAccountForm = document.getElementById('add-account-form');
             const editAccountForm = document.getElementById('edit-account-form');
@@ -1000,3 +1003,4 @@ document.addEventListener('DOMContentLoaded', () => {
         performInitialLoad();
         initializeSubPageScripts();
     }
+});
