@@ -1,0 +1,11 @@
+# netlify.toml
+
+# این بخش به نتلیفای می‌گوید که توابع شما کجا هستند
+[build]
+  functions = "netlify/functions"
+
+# این بخش حیاتی، یک پراکسی از /api/ به توابع شما ایجاد می‌کند
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200

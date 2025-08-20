@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="حسابداری">
+    <meta name="theme-color" content="#111827"/>
+
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="images/icons/icon-72x72.png" sizes="72x72">
+    <link rel="apple-touch-icon" href="images/icons/icon-192x192.png">
+
+    <title>حسابداری شخصی</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+          darkMode: 'class',
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: #111827; /* همیشه مشکی برای اسپلش */
+            transition: background-color 0.3s ease;
+        }
+        .dark body {
+            background-color: #111827;
+        }
+        .form-input {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            transition: border-color 0.2s, background-color 0.3s ease, color 0.3s ease;
+        }
+        .dark .form-input {
+            background-color: #374151;
+            border-color: #4b5563;
+            color: #f3f4f6;
+        }
+        .form-input:focus {
+            border-color: #3b82f6;
+            outline: none;
+        }
+        .gradient-button {
+            background-image: linear-gradient(to right, #50B3F0, #2C82C9);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .dark .glass-card {
+            background: rgba(31, 41, 55, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* استایل‌های صفحه اسپلش */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* تغییر رنگ پس‌زمینه به رنگ تم تاریک */
+            background-color: #111827;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            transition: opacity 0.5s ease-out;
+        }
+        #splash-logo {
+            width: 80px;
+            height: 80px;
+            animation: pulse 2s infinite ease-in-out;
+        }
+        #splash-screen p {
+            position: absolute;
+            bottom: 40px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+        #main-content {
+            opacity: 0;
+            transition: opacity 0.5s ease-in;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body class="dark">
+
+    <!-- صفحه اسپلش -->
+    <div id="splash-screen">
+        <img id="splash-logo" src="logo.png" alt="Logo">
+        <p>from Ali Afkham</p>
+    </div>
+
+    <!-- محتوای اصلی صفحه ورود (در ابتدا مخفی است) -->
+    <div id="main-content">
+        <div class="w-full max-w-md p-8 space-y-8">
+            <header class="text-center">
+                <h1 class="text-3xl font-extrabold text-gray-800 dark:text-white mb-2">به حسابداری شخصی خوش آمدید!</h1>
+                <p class="text-gray-500 dark:text-gray-400">برای ادامه وارد حساب کاربری خود شوید</p>
+            </header>
+
+            <form id="login-form" class="mt-8 space-y-6">
+                <div class="rounded-md shadow-sm -space-y-px">
+                    <div class="relative">
+                        <!-- افزودن readonly برای جلوگیری از فوکوس خودکار در موبایل -->
+                        <input id="email-address" name="email" type="email" autocomplete="email" required class="form-input appearance-none rounded-lg relative block w-full px-3 py-4 text-gray-900 placeholder-gray-500 focus:z-10 sm:text-sm" placeholder="ایمیل شما" tabindex="-1" readonly>
+                    </div>
+                    <div class="relative pt-4">
+                        <!-- افزودن readonly برای جلوگیری از فوکوس خودکار در موبایل -->
+                        <input id="password" name="password" type="password" autocomplete="current-password" required class="form-input appearance-none rounded-lg relative block w-full px-3 py-4 text-gray-900 placeholder-gray-500 focus:z-10 sm:text-sm" placeholder="رمز عبور" tabindex="-1" readonly>
+                        <span id="toggle-password" class="absolute inset-y-0 left-0 pl-3 pt-4 flex items-center cursor-pointer">
+                            <i class="fas fa-eye-slash text-gray-400"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label for="remember-me" class="mr-2 block text-sm text-gray-900 dark:text-gray-300"> مرا به خاطر بسپار </label>
+                    </div>
+
+                    <div class="text-sm">
+                        <a href="#" class="font-medium text-red-500 hover:text-red-600"> رمز عبور را فراموش کرده‌اید؟ </a>
+                    </div>
+                </div>
+
+                <div>
+                    <button type="submit" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white gradient-button hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        ورود
+                    </button>
+                </div>
+            </form>
+
+            <div class="text-center mt-4">
+                <a href="dashboard.html?test=true" class="text-sm font-medium text-gray-600 dark:text-gray-400 hover:underline">ورود موقت (برای تست داشبورد)</a>
+            </div>
+
+            <p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+                حساب کاربری ندارید؟
+                <a href="register.html" class="font-medium text-red-500 hover:text-red-600"> ثبت نام کنید </a>
+            </p>
+        </div>
+    </div>
+
+    <div class="fixed bottom-5 left-5">
+        <div class="glass-card rounded-full p-2 shadow-lg">
+            <button id="theme-toggle" type="button" class="text-gray-800 dark:text-gray-200 focus:outline-none w-8 h-8 flex items-center justify-center">
+                <svg id="theme-toggle-dark-icon" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                <svg id="theme-toggle-light-icon" class="hidden w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.707.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!-- محتوای اصلی صفحه داشبورد -->
+<div class="page" style="transform: none; position: relative; background-color: transparent;">
+    <!-- بخش بالایی (هدر) صفحه داشبورد -->
+    <div class="flex-shrink-0 header-bg relative">
+        <div class="header-overlay text-white p-6 pb-10">
+            <header class="flex items-center">
+                <div class="flex-1 flex justify-start">
+                    <a href="#" id="go-to-profile" class="glass-item w-9 h-9 rounded-full flex items-center justify-center"><i class="fa-solid fa-user text-lg"></i></a>
+                </div>
+                <div class="flex-shrink-0">
+                    <div id="total-balance-container" class="glass-item glass-item-heavy rounded-full px-3 py-0 text-center cursor-pointer flex flex-col justify-center h-14">
+                        <div id="balance-details" class="mb-1" style="transition: all 0.3s ease; max-height: 0; opacity: 0; overflow: hidden;">
+                            <p class="text-xs opacity-80">موجودی کل</p>
+                        </div>
+                        <p class="text-lg font-bold amount-display" data-original-value="۱۲۳,۴۵۶,۷۸۹">۱۲۳,۴۵۶,۷۸۹</p>
+                    </div>
+                </div>
+                <div class="flex-1 flex justify-end gap-2">
+                    <button id="toggle-amounts-btn" class="glass-item w-9 h-9 rounded-full flex items-center justify-center">
+                        <i id="toggle-amounts-icon" class="fa-solid fa-eye"></i>
+                    </button>
+                    <a href="#" id="go-to-accounts" class="glass-item w-9 h-9 rounded-full flex items-center justify-center"><i class="fa-solid fa-credit-card text-lg"></i></a>
+                </div>
+            </header>
+            <hr class="border-white/20 my-4">
+            <!-- اسلایدر کارت‌های بانکی -->
+            <div class="swiper card-slider">
+                <div class="swiper-wrapper">
+                    <!-- اسلایدها توسط جاوااسکریپت پر می‌شوند -->
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+        <!-- دکمه‌های عملیات سریع -->
+        <section class="absolute bottom-0 left-0 right-0 transform translate-y-1/2 flex justify-around text-center z-20">
+            <a href="#" class="flex flex-col items-center space-y-2"><div class="w-14 h-14 rounded-full flex items-center justify-center shadow-lg" style="background-color: rgba(62, 178, 144, 0.25); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.2);"><i class="fa-solid fa-arrow-down text-2xl text-white"></i></div><span class="text-xs text-gray-600 dark:text-gray-300">درآمد</span></a>
+            <a href="#" class="flex flex-col items-center space-y-2"><div class="w-14 h-14 rounded-full flex items-center justify-center shadow-lg" style="background-color: rgba(255, 138, 113, 0.25); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.2);"><i class="fa-solid fa-arrow-up text-2xl text-white"></i></div><span class="text-xs text-gray-600 dark:text-gray-300">هزینه</span></a>
+            <a href="#" class="flex flex-col items-center space-y-2"><div class="w-14 h-14 rounded-full flex items-center justify-center shadow-lg" style="background-color: rgba(237, 204, 85, 0.25); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.2);"><i class="fa-solid fa-sack-dollar text-2xl text-white"></i></div><span class="text-xs text-gray-600 dark:text-gray-300">دارائی</span></a>
+            <a href="#" class="flex flex-col items-center space-y-2"><div class="w-14 h-14 rounded-full flex items-center justify-center shadow-lg" style="background-color: rgba(86, 173, 240, 0.25); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.2);"><i class="fa-solid fa-chart-pie text-2xl text-white"></i></div><span class="text-xs text-gray-600 dark:text-gray-300">گزارش</span></a>
+        </section>
+    </div>
+
+    <!-- بخش خلاصه وضعیت -->
+    <div class="flex-shrink-0 px-4 pt-12 z-10 bg-f8fafc dark:bg-020617">
+        <hr class="border-gray-200 dark:border-gray-700">
+        <div class="flex justify-between items-center my-4">
+            <h2 class="text-lg font-bold text-gray-800 dark:text-white">خلاصه وضعیت</h2>
+            <a href="#" id="go-to-summary-details" class="text-red-400"><i class="fa-solid fa-arrow-left text-xl"></i></a>
+        </div>
+        <hr class="border-gray-200 dark:border-gray-700">
+    </div>
+
+    <!-- لیست کارت‌های خلاصه وضعیت -->
+    <div class="flex-grow overflow-y-auto no-scrollbar px-4 pt-4" style="padding-bottom: 8rem;">
+        <div id="dashboard-summary-list" class="space-y-3">
+            <!-- کارت‌ها توسط جاوااسکریپت پر می‌شوند -->
+        </div>
+    </div>
+</div>

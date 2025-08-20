@@ -1,0 +1,22 @@
+{
+  "name": "حسابداری شخصی",
+  "short_name": "حسابداری",
+  "description": "یک اپلیکیشن ساده برای مدیریت امور مالی شخصی",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#6366f1",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "A22.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "A22.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}

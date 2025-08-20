@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>داشبورد - حسابداری شخصی</title>
+
+    <!-- PWA Tags -->
+    <meta name="theme-color" content="#f8fafc"/>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="A22.jpg">
+    <link rel="apple-touch-icon" href="A22.jpg">
+    
+    <!-- Swiper.js for Card Slider -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+
+    <!-- اتصال به Tailwind CSS از طریق CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+    
+    <!-- فونت و آیکون‌ها -->
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    
+    <style>
+        /* --- استایل‌های اصلی فایل شما (تقریبا بدون تغییر) --- */
+        html, body {
+            height: 100%;
+            overflow: hidden; 
+            overscroll-behavior: none; 
+        }
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: #e5e7eb;
+        }
+        .dark body {
+            background-color: #000;
+        }
+        .mobile-wrapper {
+            max-width: 420px;
+            margin: 0 auto;
+            height: 100%; 
+            position: relative;
+            box-shadow: 0 0 25px rgba(0,0,0,0.15);
+            overflow: hidden; 
+            background-color: #f8fafc;
+        }
+        .dark .mobile-wrapper {
+            background-color: #020617;
+        }
+
+        /* --- ساختار صفحات (بدون تغییر) --- */
+        #page-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        .page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        .scroll-container-original { /* نام کلاس اصلی حفظ شد برای بخش‌های دیگر */
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            touch-action: pan-y; 
+        }
+        .scroll-container-original::-webkit-scrollbar {
+            display: none;
+        }
+
+        #profile-page { transform: translateX(100%); }
+        #dashboard-page { transform: translateX(0%); }
+        #accounts-page { transform: translateX(-100%); }
+
+        .mobile-wrapper.view-profile #dashboard-page { transform: translateX(-100%); }
+        .mobile-wrapper.view-profile #profile-page { transform: translateX(0%); }
+
+        .mobile-wrapper.view-accounts #dashboard-page { transform: translateX(100%); }
+        .mobile-wrapper.view-accounts #accounts-page { transform: translateX(0%); }
+        
+        /* --- استایل‌های شیشه‌ای و هدر (از فایل اصلی شما) --- */
+        .header-bg {
+            background-image: url('06.jpg');
+            background-size: cover;
+            background-position: center;
+            /* **تنها تغییر در CSS:** پس‌زمینه ثابت شد تا با محتوا اسکرول نشود */
+            background-attachment: fixed;
+            border-bottom-left-radius: 3rem;
+            border-bottom-right-radius: 3rem;
+        }
+        .header-overlay {
+            background-color: rgba(0, 0, 0, 0.1); 
+            border-bottom-left-radius: 3rem;
+            border-bottom-right-radius: 3rem;
+        }
+        .dark .header-overlay {
+            background-color: rgba(17, 24, 39, 0.6);
+        }
+        .glass-card, .glass-item, .glass-nav, .glass-menu-item {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .glass-item, .glass-card {
+             background: rgba(255, 255, 255, 0.15);
+        }
+        .dark .glass-card, .dark .glass-item, .dark .glass-nav, .dark .glass-menu-item {
+            background: rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glass-item-heavy {
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+        }
+        .glass-menu-item.green { background-color: rgba(62, 178, 144, 0.25); }
+        .glass-menu-item.red { background-color: rgba(255, 138, 113, 0.25); }
+        .glass-menu-item.yellow { background-color: rgba(237, 204, 85, 0.25); }
+        .glass-menu-item.blue { background-color: rgba(86, 173, 240, 0.25); }
+        
+        /* --- استایل‌های منو و Swiper (بدون تغییر) --- */
+        .bottom-nav {
+            border-top: 1px solid rgba(229, 231, 255, 0.5);
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .dark .bottom-nav { border-top: 1px solid rgba(51, 65, 85, 0.5); }
+        .bottom-nav a.active { color: #e989a6; }
+        .mobile-wrapper.view-profile .bottom-nav,
+        .mobile-wrapper.view-accounts .bottom-nav { transform: translateY(100%); }
+        .swiper { padding-bottom: 30px !important; touch-action: pan-x; }
+        .swiper-container, .swiper { overflow: visible !important; }
+        .swiper-pagination-bullet { background: rgba(255, 255, 255, 0.5) !important; width: 6px; height: 6px; }
+        .swiper-pagination-bullet-active { background-color: white !important; }
+        
+        /* --- مخفی کردن اسکرول‌بار --- */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* --- استایل‌های مودال‌ها (بدون تغییر) --- */
+        .modal-overlay { position: fixed; inset: 0; background-color: rgba(0,0,0,0.5); z-index: 100; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; }
+        .modal-content { position: absolute; bottom: 0; left: 0; right: 0; margin: 0 auto; width: 100%; max-width: 420px; max-height: 90vh; background-color: rgba(243, 244, 246, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top-left-radius: 1.5rem; border-top-right-radius: 1.5rem; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); display: flex; flex-direction: column; }
+        .dark .modal-content { background-color: rgba(31, 41, 55, 0.8); }
+        .mobile-wrapper.view-add-account #add-account-overlay, .mobile-wrapper.view-edit-account #edit-account-overlay { opacity: 1; visibility: visible; }
+        .mobile-wrapper.view-add-account #add-account-modal, .mobile-wrapper.view-edit-account #edit-account-modal { transform: translateY(0%); }
+        .account-item .details { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out; padding-top: 0; padding-bottom: 0; }
+        .account-item.expanded .details { max-height: 200px; padding-top: 1rem; padding-bottom: 1rem; }
+        .iban-input { direction: ltr; text-align: right; }
+        
+        /* سایر استایل‌های اصلی شما بدون تغییر باقی ماندند */
+        .theme-toggle-glass { background: rgba(255, 255, 255, 0.1); }
+        .dark .theme-toggle-glass { background: rgba(0, 0, 0, 0.1); }
+        #balance-details { transition: all 0.3s ease; max-height: 0; opacity: 0; overflow: hidden; }
+        #total-balance-container.details-visible #balance-details { max-height: 50px; opacity: 1; }
+        .toggle-checkbox { transition: transform 0.3s ease; }
+        .toggle-checkbox:checked { transform: translateX(-1rem); border-color: #4ade80; }
+        .toggle-label { transition: background-color: 0.3s ease; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #4ade80; }
+    </style>
+</head>
+<body>
+
+    <div id="mobile-wrapper" class="mobile-wrapper">
+        <div id="page-container">
+            <!-- ========== 1. صفحه داشبورد (با ساختار اصلاح‌شده برای اسکرول) ========== -->
+            <div id="dashboard-page" class="page flex flex-col h-full">
+                <!-- **بخش بالا (ثابت)**: شامل هدر و اسلایدر کارت‌ها -->
+                <div class="flex-shrink-0 header-bg">
+                    <!-- **تغییر:** فاصله پایین کمتر شد تا منوهای دایره‌ای بالاتر بیایند -->
+                    <div class="header-overlay text-white p-6 pb-12">
+                        <!-- **هدر**: ثابت است -->
+                        <header class="flex justify-between items-center">
+                            <a href="#" id="go-to-profile" class="glass-item w-9 h-9 rounded-full flex items-center justify-center"><i class="fa-solid fa-user text-lg"></i></a>
+                            <div id="total-balance-container" class="glass-item glass-item-heavy rounded-lg px-3 py-1 text-center cursor-pointer">
+                                <div id="balance-details" class="mb-1">
+                                    <p class="text-xs opacity-80">موجودی کل</p>
+                                </div>
+                                <p class="text-lg font-bold">۱۲۳,۴۵۶,۷۸۹</p>
+                            </div>
+                            <a href="#" id="go-to-accounts" class="glass-item w-9 h-9 rounded-full flex items-center justify-center"><i class="fa-solid fa-credit-card text-lg"></i></a>
+                        </header>
+                        <hr class="border-white/20 my-4">
+                        <!-- **کارت‌ها**: اسکرول افقی (با Swiper) -->
+                        <div class="swiper card-slider">
+                            <div class="swiper-wrapper">
+                                <!-- Slides will be populated by JS -->
+                            </div>
+                            <div class="swiper-pagination"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- **بخش پایین (اسکرول عمودی)**: شامل منوها و خلاصه وضعیت -->
+                <div class="flex-grow overflow-y-auto no-scrollbar">
+                    <main class="px-4 -mt-7 z-10 relative">
+                        <!-- **بخش چسبنده (Sticky)**: این بخش در حین اسکرول به بالا می‌چسبد -->
+                        <!-- **تغییر:** پس‌زمینه سفید/گرادینت حذف شد -->
+                        <div class="sticky top-0 z-10 pt-2">
+                            <!-- منوهای دایره‌ای دسترسی سریع (ثابت) -->
+                            <section class="flex justify-around text-center">
+                                <a href="#" class="flex flex-col items-center space-y-2"><div class="w-14 h-14 rounded-full flex items-center justify-center shadow-lg glass-menu-item green"><i class="fa-solid fa-arrow-down text-2xl text-white"></i></div><span class="text-xs text-gray-600 dark:text-gray-300">درآمد</span></a>
+                                <a href="#" class="flex flex-col items-center space-y-2"><div class="w-14 h-14 rounded-full flex items-center justify-center shadow-lg glass-menu-item red"><i class="fa-solid fa-arrow-up text-2xl text-white"></i></div><span class="text-xs text-gray-600 dark:text-gray-300">هزینه</span></a>
+                                <a href="#" class="flex flex-col items-center space-y-2"><div class="w-14 h-14 rounded-full flex items-center justify-center shadow-lg glass-menu-item yellow"><i class="fa-solid fa-sack-dollar text-2xl text-white"></i></div><span class="text-xs text-gray-600 dark:text-gray-300">دارائی</span></a>
+                                <a href="#" class="flex flex-col items-center space-y-2"><div class="w-14 h-14 rounded-full flex items-center justify-center shadow-lg glass-menu-item blue"><i class="fa-solid fa-chart-pie text-2xl text-white"></i></div><span class="text-xs text-gray-600 dark:text-gray-300">گزارش</span></a>
+                            </section>
+                            
+                            <!-- دیوایدر و عنوان (ثابت) -->
+                            <!-- **تغییر:** پس‌زمینه سفید/گرادینت حذف شد -->
+                            <div>
+                                <hr class="border-gray-200 dark:border-gray-700 my-6">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h2 class="text-lg font-bold text-gray-800 dark:text-white">خلاصه وضعیت</h2>
+                                    <a href="#" class="text-red-400"><i class="fa-solid fa-arrow-left text-xl"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- **کارت‌های خلاصه وضعیت**: محتوای قابل اسکرول -->
+                        <div class="space-y-3 pb-24"> <!-- pb-24 برای ایجاد فاصله از منوی پایین -->
+                            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex justify-between items-center"><div><p class="font-semibold text-gray-800 dark:text-gray-200">اقساط این ماه</p><p class="text-sm text-gray-500 dark:text-gray-400">۳ قسط باقی مانده</p></div><p class="text-lg font-bold text-gray-700 dark:text-gray-300">۲,۵۰۰,۰۰۰</p></div>
+                            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex justify-between items-center"><div><p class="font-semibold text-gray-800 dark:text-gray-200">پروژه‌های فعال</p><p class="text-sm text-gray-500 dark:text-gray-400">۲ پروژه در جریان</p></div><p class="text-lg font-bold text-gray-700 dark:text-gray-300">۱۲,۰۰۰,۰۰۰</p></div>
+                            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex justify-between items-center"><div><p class="font-semibold text-gray-800 dark:text-gray-200">هزینه‌های این ماه</p><p class="text-sm text-gray-500 dark:text-gray-400">جمع کل هزینه‌ها</p></div><p class="text-lg font-bold text-gray-700 dark:text-gray-300">۴,۷۵۰,۰۰۰</p></div>
+                            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex justify-between items-center"><div><p class="font-semibold text-gray-800 dark:text-gray-200">پرداخت قبض برق</p><p class="text-sm text-gray-500 dark:text-gray-400">هفته گذشته</p></div><p class="text-lg font-bold text-gray-700 dark:text-gray-300">۱۵۰,۰۰۰</p></div>
+                            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex justify-between items-center"><div><p class="font-semibold text-gray-800 dark:text-gray-200">خرید اینترنتی</p><p class="text-sm text-gray-500 dark:text-gray-400">دو روز پیش</p></div><p class="text-lg font-bold text-gray-700 dark:text-gray-300">۳۲۰,۰۰۰</p></div>
+                            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex justify-between items-center"><div><p class="font-semibold text-gray-800 dark:text-gray-200">واریز به حساب</p><p class="text-sm text-gray-500 dark:text-gray-400">امروز</p></div><p class="text-lg font-bold text-green-500">+ ۱,۰۰۰,۰۰۰</p></div>
+                        </div>
+                    </main>
+                </div>
+            </div>
+
+            <!-- ========== 2. صفحه حساب‌ها (کاملا بدون تغییر) ========== -->
+            <div id="accounts-page" class="page bg-gray-100 dark:bg-slate-900">
+                <div class="scroll-container-original pb-24">
+                    <header class="flex items-center p-6 sticky top-0 bg-gray-100/80 dark:bg-slate-900/80 backdrop-blur-sm z-10 border-b border-gray-200 dark:border-slate-800">
+                        <button id="go-back-to-dashboard-from-accounts" class="text-gray-600 dark:text-gray-300">
+                            <i class="fa-solid fa-arrow-left text-xl"></i>
+                        </button>
+                        <h1 class="text-lg font-bold text-gray-800 dark:text-white mx-auto">حساب های بانکی</h1>
+                        <div class="w-6"></div>
+                    </header>
+                    <main class="p-6 space-y-8">
+                        <section>
+                            <h2 class="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-4">کارت‌های بانکی:</h2>
+                            <div id="accounts-list" class="space-y-4">
+                                <!-- Account items will be populated by JS -->
+                            </div>
+                        </section>
+                        <section class="text-center mt-12">
+                            <button id="add-account-btn" class="w-16 h-16 glass-menu-item blue text-white rounded-full flex items-center justify-center mx-auto shadow-lg transition-transform active:scale-90">
+                                <i class="fa-solid fa-plus text-2xl"></i>
+                            </button>
+                        </section>
+                    </main>
+                </div>
+            </div>
+
+            <!-- ========== 3. صفحه پروفایل (کاملا بدون تغییر) ========== -->
+            <div id="profile-page" class="page bg-gray-100 dark:bg-slate-900">
+                <div class="scroll-container-original pb-24">
+                    <header class="flex items-center p-6 sticky top-0 bg-gray-100/80 dark:bg-slate-900/80 backdrop-blur-sm z-10 border-b border-gray-200 dark:border-slate-800">
+                        <button id="go-back-to-dashboard-from-profile" class="text-gray-600 dark:text-gray-300">
+                            <i class="fa-solid fa-arrow-right text-xl"></i>
+                        </button>
+                        <h1 class="text-lg font-bold text-gray-800 dark:text-white mx-auto">پروفایل</h1>
+                        <div class="w-6"></div>
+                    </header>
+                    <main class="p-6">
+                        <div class="flex items-center pb-6 border-b border-gray-200 dark:border-slate-700">
+                            <img class="w-16 h-16 rounded-full" src="https://placehold.co/100x100/EFEFEF/333333?text=CW" alt="User Avatar">
+                            <div class="mr-4">
+                                <h2 class="text-xl font-bold text-gray-800 dark:text-white">کریستینا ولف</h2>
+                                <p class="text-gray-500 dark:text-gray-400">+۱ ۹۵۴ ۶۲۱ ۷۸۴۵</p>
+                            </div>
+                        </div>
+                        <div class="mt-8 space-y-2">
+                            <a href="#" class="flex justify-between items-center p-4 bg-white dark:bg-slate-800 rounded-lg">
+                                <div class="flex items-center">
+                                    <i class="fa-solid fa-user-pen text-gray-500 w-5 text-center"></i>
+                                    <span class="mr-4 text-gray-700 dark:text-gray-200">اطلاعات شخصی</span>
+                                </div>
+                                <i class="fa-solid fa-chevron-left text-gray-400"></i>
+                            </a>
+                            <div class="flex justify-between items-center p-4 bg-white dark:bg-slate-800 rounded-lg">
+                                <div class="flex items-center">
+                                    <i class="fa-solid fa-bell text-gray-500 w-5 text-center"></i>
+                                    <span class="mr-4 text-gray-700 dark:text-gray-200">اعلان‌ها</span>
+                                </div>
+                                <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                                    <input type="checkbox" name="toggle" id="toggle-notifications" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                                    <label for="toggle-notifications" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-gray-600 cursor-pointer"></label>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center p-4 bg-white dark:bg-slate-800 rounded-lg">
+                                <div class="flex items-center">
+                                    <i class="fa-solid fa-face-smile text-gray-500 w-5 text-center"></i>
+                                    <span class="mr-4 text-gray-700 dark:text-gray-200">تشخیص چهره</span>
+                                </div>
+                                <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                                    <input type="checkbox" name="toggle" id="toggle-faceid" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" checked/>
+                                    <label for="toggle-faceid" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-gray-600 cursor-pointer"></label>
+                                </div>
+                            </div>
+                            <a href="#" class="flex items-center p-4 bg-white dark:bg-slate-800 rounded-lg">
+                                <i class="fa-solid fa-arrow-right-from-bracket text-red-500 w-5 text-center"></i>
+                                <span class="mr-4 text-red-500 font-semibold">خروج از حساب</span>
+                            </a>
+                        </div>
+                    </main>
+                </div>
+            </div>
+        </div>
+        <!-- منو و دکمه تم به بیرون از کانتینر صفحات منتقل شدند تا ثابت بمانند -->
+        <nav class="glass-nav bottom-nav absolute bottom-0 inset-x-0 h-16 flex justify-around items-center text-gray-500 dark:text-gray-400 z-20 rounded-t-2xl">
+            <a href="#" class="flex flex-col items-center space-y-1 w-1/5"><i class="fa-solid fa-ellipsis text-xl"></i><span class="text-xs">بیشتر</span></a>
+            <a href="#" class="flex flex-col items-center space-y-1 w-1/5"><i class="fa-solid fa-folder-open text-xl"></i><span class="text-xs">پروژه‌ها</span></a>
+            <a href="#" class="flex flex-col items-center space-y-1 w-1/5"><i class="fa-solid fa-right-left text-xl"></i><span class="text-xs">تراکنش‌ها</span></a>
+            <a href="#" class="flex flex-col items-center space-y-1 w-1/5"><i class="fa-solid fa-calendar-days text-xl"></i><span class="text-xs">تقویم</span></a>
+            <a href="#" class="active flex flex-col items-center space-y-1 w-1/5"><i class="fa-solid fa-house text-xl"></i><span class="text-xs">داشبورد</span></a>
+        </nav>
+        <div class="absolute bottom-20 left-5 z-50">
+            <div class="glass-card theme-toggle-glass rounded-full p-2 shadow-lg">
+                <button id="theme-toggle" type="button" class="text-gray-800 dark:text-gray-200 focus:outline-none w-8 h-8 flex items-center justify-center">
+                    <svg id="theme-toggle-dark-icon" class="hidden w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                    <svg id="theme-toggle-light-icon" class="hidden w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.707.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+                </button>
+            </div>
+        </div>
+        
+        <!-- ========== مودال افزودن حساب (کاملا بدون تغییر) ========== -->
+        <div id="add-account-overlay" class="modal-overlay">
+            <div id="add-account-modal" class="modal-content">
+                <header class="p-4 flex justify-between items-center border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+                    <h2 class="text-lg font-bold text-gray-800 dark:text-white">افزودن حساب جدید</h2>
+                    <button id="close-add-account-btn" class="text-gray-500 dark:text-gray-400 text-2xl">&times;</button>
+                </header>
+                <form id="add-account-form" class="p-6 space-y-4 overflow-y-auto">
+                    <div>
+                        <label for="bank-name-select" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">انتخاب بانک</label>
+                        <select id="bank-name-select" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required>
+                            <!-- Options will be added by JS -->
+                        </select>
+                    </div>
+                    <div id="custom-bank-wrapper" class="hidden">
+                        <label for="custom-bank-name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">نام بانک سفارشی</label>
+                        <input type="text" id="custom-bank-name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
+                    </div>
+                    <div>
+                        <label for="card-number" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">شماره کارت</label>
+                        <input type="text" id="card-number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="**** **** **** ****" required>
+                    </div>
+                     <div>
+                        <label for="account-number" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">شماره حساب</label>
+                        <input type="number" id="account-number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
+                    </div>
+                    <div>
+                        <label for="iban-number" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">شماره شبا</label>
+                        <div class="relative">
+                            <input type="text" id="iban-number" class="iban-input bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-10 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="... 1234 5678">
+                             <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 dark:text-gray-400">IR</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="expiry-date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">تاریخ انقضا (YY/MM)</label>
+                        <input type="text" id="expiry-date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="مثلا: ۰۵/۲۹" required>
+                    </div>
+                    <div>
+                        <label for="initial-balance" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">موجودی اولیه (تومان)</label>
+                        <input type="number" id="initial-balance" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="مثلا: 500000" required>
+                    </div>
+                     <div>
+                        <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">توضیحات</label>
+                        <textarea id="description" rows="3" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"></textarea>
+                    </div>
+                    <button type="submit" class="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">ذخیره حساب</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ========== مودال ویرایش حساب (کاملا بدون تغییر) ========== -->
+        <div id="edit-account-overlay" class="modal-overlay">
+            <div id="edit-account-modal" class="modal-content">
+                <header class="p-4 flex justify-between items-center border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+                    <h2 class="text-lg font-bold text-gray-800 dark:text-white">ویرایش حساب</h2>
+                    <button id="close-edit-account-btn" class="text-gray-500 dark:text-gray-400 text-2xl">&times;</button>
+                </header>
+                <form id="edit-account-form" class="p-6 space-y-4 overflow-y-auto">
+                    <input type="hidden" id="edit-account-id">
+                    <div>
+                        <label for="edit-bank-name-select" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">انتخاب بانک</label>
+                        <select id="edit-bank-name-select" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required>
+                            <!-- Options will be added by JS -->
+                        </select>
+                    </div>
+                     <div id="edit-custom-bank-wrapper" class="hidden">
+                        <label for="edit-custom-bank-name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">نام بانک سفارشی</label>
+                        <input type="text" id="edit-custom-bank-name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
+                    </div>
+                    <div>
+                        <label for="edit-card-number" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">شماره کارت</label>
+                        <input type="text" id="edit-card-number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required>
+                    </div>
+                    <div>
+                        <label for="edit-expiry-date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">تاریخ انقضا (YY/MM)</label>
+                        <input type="text" id="edit-expiry-date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required>
+                    </div>
+                    <div>
+                        <label for="correct-balance" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">اصلاح موجودی (تومان)</label>
+                        <input type="number" id="correct-balance" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required>
+                    </div>
+                    <div class="pt-4 flex space-x-2 space-x-reverse">
+                        <button type="submit" class="w-full text-white bg-green-600 hover:bg-green-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center">ذخیره تغییرات</button>
+                        <button type="button" id="delete-account-btn" class="w-full text-white bg-red-600 hover:bg-red-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center">حذف حساب</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- کتابخانه SortableJS برای مرتب‌سازی -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <!-- اتصال به فایل JS خارجی -->
+    <script type="module" src="dashboard.js"></script>
+</body>
+</html>
